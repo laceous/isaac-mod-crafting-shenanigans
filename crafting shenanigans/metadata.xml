@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <name>Crafting Shenanigans</name>
+    <directory>crafting shenanigans</directory>
+    <id>3719971038</id>
+    <description>This mod requires REPENTOGON. Press the tilde key to open the new debug console and menu. There's a new Shenanigans option that will let you calculate the output for the bag of crafting (Tainted Cain's starting item).
+
+Note: order doesn't matter.
+
+If you start a new run or pick up an item like sacred orb, toggle the controls to make sure the current run's seed and items are being taken into account.</description>
+    <version>1.2</version>
+    <visibility>Public</visibility>
+    <tag id="Lua"/>
+</metadata>
