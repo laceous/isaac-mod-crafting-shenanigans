@@ -131,7 +131,7 @@ if REPENTOGON then
     if collectibleConfig then
       Isaac.DebugString(mod:buildXmlStr(craftingPickups) .. ' | ' .. mod:localize('Items', collectibleConfig.Name) .. ' | ' .. mod:getItemPoolName(itemPool) .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. collectibleConfig.Quality)
     else
-      Isaac.DebugString(collectible .. ' | ' .. mod:getItemPoolName(itemPool))
+      Isaac.DebugString(mod:buildXmlStr(craftingPickups) .. ' | ' .. collectible .. ' | ' .. mod:getItemPoolName(itemPool))
     end
   end
   
