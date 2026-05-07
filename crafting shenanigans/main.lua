@@ -2,6 +2,38 @@ local mod = RegisterMod('Crafting Shenanigans', 1)
 local game = Game()
 
 if REPENTOGON then
+  mod.craftingXmlMap = {
+    [BagOfCraftingPickup.BOC_RED_HEART] = 'h',
+    [BagOfCraftingPickup.BOC_SOUL_HEART] = 's',
+    [BagOfCraftingPickup.BOC_BLACK_HEART] = 'b',
+    [BagOfCraftingPickup.BOC_ETERNAL_HEART] = 'e',
+    [BagOfCraftingPickup.BOC_GOLD_HEART] = 'g',
+    [BagOfCraftingPickup.BOC_BONE_HEART] = 'B',
+    [BagOfCraftingPickup.BOC_ROTTEN_HEART] = 'r',
+    [BagOfCraftingPickup.BOC_PENNY] = '.',
+    [BagOfCraftingPickup.BOC_NICKEL] = 'o',
+    [BagOfCraftingPickup.BOC_DIME] = 'O',
+    [BagOfCraftingPickup.BOC_LUCKY_PENNY] = 'Q',
+    [BagOfCraftingPickup.BOC_KEY] = '/',
+    [BagOfCraftingPickup.BOC_GOLD_KEY] = '|',
+    [BagOfCraftingPickup.BOC_CHARGED_KEY] = '%',
+    [BagOfCraftingPickup.BOC_BOMB] = 'v',
+    [BagOfCraftingPickup.BOC_GOLD_BOMB] = '^',
+    [BagOfCraftingPickup.BOC_GIGA_BOMB] = 'V',
+    [BagOfCraftingPickup.BOC_MINI_BATTERY] = '1', -- micro battery 5.90.2
+    [BagOfCraftingPickup.BOC_BATTERY] = '2', -- lil battery 5.90.1
+    [BagOfCraftingPickup.BOC_MEGA_BATTERY] = '3', -- 5.90.3
+    [BagOfCraftingPickup.BOC_CARD] = '[',
+    [BagOfCraftingPickup.BOC_PILL] = '(',
+    [BagOfCraftingPickup.BOC_RUNE] = '>',
+    [BagOfCraftingPickup.BOC_DICE_SHARD] = '?',
+    [BagOfCraftingPickup.BOC_CRACKED_KEY] = '~',
+    [BagOfCraftingPickup.BOC_GOLD_PENNY] = '$',
+    [BagOfCraftingPickup.BOC_GOLD_PILL] = '{',
+    [BagOfCraftingPickup.BOC_GOLD_BATTERY] = '4', -- 5.90.4
+    [BagOfCraftingPickup.BOC_POOP] = '_',
+  }
+  
   function mod:onModsLoaded()
     mod:setupImGui()
   end
@@ -60,16 +92,16 @@ if REPENTOGON then
     return tbl[i] or i
   end
   
-  function mod:buildXmlStr(craftingPickups, craftingXmlMap)
+  function mod:buildXmlStr(craftingPickups)
     local s = ''
     for _, v in ipairs(craftingPickups) do
-      s = s .. craftingXmlMap[v]
+      s = s .. mod.craftingXmlMap[v]
     end
     return s
   end
   
-  function mod:doXmlMapReverseLookup(c, craftingXmlMap)
-    for k, v in pairs(craftingXmlMap) do
+  function mod:doXmlMapReverseLookup(c)
+    for k, v in pairs(mod.craftingXmlMap) do
       if c == v then
         return k
       end
@@ -89,6 +121,43 @@ if REPENTOGON then
       end
     else
       ImGui.UpdateText(txtOutputId, 'Refresh once you are in a run!')
+    end
+  end
+  
+  function mod:logBagOfCraftingOutput(craftingPickups)
+    local itemConfig = Isaac.GetItemConfig()
+    local collectible, itemPool = EntityPlayer.CalculateBagOfCraftingOutput(craftingPickups)
+    local collectibleConfig = itemConfig:GetCollectible(collectible)
+    if collectibleConfig then
+      Isaac.DebugString(mod:buildXmlStr(craftingPickups) .. ' | ' .. mod:localize('Items', collectibleConfig.Name) .. ' | ' .. mod:getItemPoolName(itemPool) .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. collectibleConfig.Quality)
+    else
+      Isaac.DebugString(collectible .. ' | ' .. mod:getItemPoolName(itemPool))
+    end
+  end
+  
+  -- https://www.geeksforgeeks.org/dsa/combinations-with-repetitions/
+  -- converted to lua
+  function mod:doCombinationRepetition(arr, n, r, tblPrefix)
+    local chosen = {}
+    mod:doCombinationRepetitionUtil(chosen, arr, 1, r, 1, n, tblPrefix)
+  end
+  
+  function mod:doCombinationRepetitionUtil(chosen, arr, index, r, start, last, tblPrefix)
+    if index == r + 1 then
+      local temp = {}
+      for _, v in ipairs(tblPrefix) do
+        table.insert(temp, v)
+      end
+      for i = 1, r do
+        table.insert(temp, arr[chosen[i]])
+      end
+      mod:logBagOfCraftingOutput(temp)
+      return
+    end
+    
+    for i = start, last do
+      chosen[index] = i
+      mod:doCombinationRepetitionUtil(chosen, arr, index + 1, r, i, last, tblPrefix)
     end
   end
   
@@ -134,37 +203,6 @@ if REPENTOGON then
     table.insert(craftingOptions, 'Golden Battery') -- 28 BOC_GOLD_BATTERY
     table.insert(craftingOptions, 'Poop Nugget')    -- 29 BOC_POOP
     
-    local craftingXmlMap = {}
-    craftingXmlMap[BagOfCraftingPickup.BOC_RED_HEART] = 'h'
-    craftingXmlMap[BagOfCraftingPickup.BOC_SOUL_HEART] = 's'
-    craftingXmlMap[BagOfCraftingPickup.BOC_BLACK_HEART] = 'b'
-    craftingXmlMap[BagOfCraftingPickup.BOC_ETERNAL_HEART] = 'e'
-    craftingXmlMap[BagOfCraftingPickup.BOC_GOLD_HEART] = 'g'
-    craftingXmlMap[BagOfCraftingPickup.BOC_BONE_HEART] = 'B'
-    craftingXmlMap[BagOfCraftingPickup.BOC_ROTTEN_HEART] = 'r'
-    craftingXmlMap[BagOfCraftingPickup.BOC_PENNY] = '.'
-    craftingXmlMap[BagOfCraftingPickup.BOC_NICKEL] = 'o'
-    craftingXmlMap[BagOfCraftingPickup.BOC_DIME] = 'O'
-    craftingXmlMap[BagOfCraftingPickup.BOC_LUCKY_PENNY] = 'Q'
-    craftingXmlMap[BagOfCraftingPickup.BOC_KEY] = '/'
-    craftingXmlMap[BagOfCraftingPickup.BOC_GOLD_KEY] = '|'
-    craftingXmlMap[BagOfCraftingPickup.BOC_CHARGED_KEY] = '%'
-    craftingXmlMap[BagOfCraftingPickup.BOC_BOMB] = 'v'
-    craftingXmlMap[BagOfCraftingPickup.BOC_GOLD_BOMB] = '^'
-    craftingXmlMap[BagOfCraftingPickup.BOC_GIGA_BOMB] = 'V'
-    craftingXmlMap[BagOfCraftingPickup.BOC_MINI_BATTERY] = '1' -- micro battery 5.90.2
-    craftingXmlMap[BagOfCraftingPickup.BOC_BATTERY] = '2' -- lil battery 5.90.1
-    craftingXmlMap[BagOfCraftingPickup.BOC_MEGA_BATTERY] = '3' -- 5.90.3
-    craftingXmlMap[BagOfCraftingPickup.BOC_CARD] = '['
-    craftingXmlMap[BagOfCraftingPickup.BOC_PILL] = '('
-    craftingXmlMap[BagOfCraftingPickup.BOC_RUNE] = '>'
-    craftingXmlMap[BagOfCraftingPickup.BOC_DICE_SHARD] = '?'
-    craftingXmlMap[BagOfCraftingPickup.BOC_CRACKED_KEY] = '~'
-    craftingXmlMap[BagOfCraftingPickup.BOC_GOLD_PENNY] = '$'
-    craftingXmlMap[BagOfCraftingPickup.BOC_GOLD_PILL] = '{'
-    craftingXmlMap[BagOfCraftingPickup.BOC_GOLD_BATTERY] = '4' -- 5.90.4
-    craftingXmlMap[BagOfCraftingPickup.BOC_POOP] = '_'
-    
     local craftingPickups = { 1, 1, 1, 1, 1, 1, 1, 1 }
     local txtInputId = 'shenanigansTxtCraftingInput'
     local txtOutputId = 'shenanigansTxtCraftingOutput'
@@ -172,13 +210,13 @@ if REPENTOGON then
     for i = 1, 8 do
       ImGui.AddCombobox('shenanigansWindowCrafting', 'shenanigansCmbCraftingPickup' .. i, '', function(j)
         craftingPickups[i] = j + 1
-        ImGui.UpdateData(txtInputId, ImGuiData.Value, mod:buildXmlStr(craftingPickups, craftingXmlMap))
+        ImGui.UpdateData(txtInputId, ImGuiData.Value, mod:buildXmlStr(craftingPickups))
         mod:calculateBagOfCraftingOutput(craftingPickups, txtOutputId)
       end, craftingOptions, 0, true)
     end
     
     ImGui.AddElement('shenanigansWindowCrafting', '', ImGuiElement.SeparatorText, 'XML Formatting')
-    ImGui.AddInputText('shenanigansWindowCrafting', txtInputId, '', nil, mod:buildXmlStr(craftingPickups, craftingXmlMap), '')
+    ImGui.AddInputText('shenanigansWindowCrafting', txtInputId, '', nil, mod:buildXmlStr(craftingPickups), '')
     ImGui.AddCallback(txtInputId, ImGuiCallback.DeactivatedAfterEdit, function(s)
       s = string.match(s, '^%s*(.-)%s*$') -- http://lua-users.org/wiki/StringTrim
       
@@ -191,7 +229,7 @@ if REPENTOGON then
       
       for i = 1, string.len(s) do
         local c = string.sub(s, i, i)
-        local bocPickup = mod:doXmlMapReverseLookup(c, craftingXmlMap)
+        local bocPickup = mod:doXmlMapReverseLookup(c)
         if bocPickup then
           ImGui.UpdateData('shenanigansCmbCraftingPickup' .. i, ImGuiData.Value, bocPickup - 1)
           craftingPickups[i] = bocPickup
@@ -201,11 +239,11 @@ if REPENTOGON then
         end
       end
       
-      ImGui.UpdateData(txtInputId, ImGuiData.Value, mod:buildXmlStr(craftingPickups, craftingXmlMap))
+      ImGui.UpdateData(txtInputId, ImGuiData.Value, mod:buildXmlStr(craftingPickups))
       mod:calculateBagOfCraftingOutput(craftingPickups, txtOutputId)
     end)
     local txtInputHelp = 'Formatting from recipes.xml\n'
-    for i, v in ipairs(craftingXmlMap) do
+    for i, v in ipairs(mod.craftingXmlMap) do
       txtInputHelp = txtInputHelp .. '\n' .. craftingOptions[i] .. ': ' .. v
     end
     ImGui.SetHelpmarker(txtInputId, txtInputHelp)
@@ -224,7 +262,7 @@ if REPENTOGON then
             ImGui.UpdateData('shenanigansCmbCraftingPickup' .. j, ImGuiData.Value, bocPickup - 1)
             craftingPickups[j] = bocPickup
           end
-          ImGui.UpdateData(txtInputId, ImGuiData.Value, mod:buildXmlStr(craftingPickups, craftingXmlMap))
+          ImGui.UpdateData(txtInputId, ImGuiData.Value, mod:buildXmlStr(craftingPickups))
           mod:calculateBagOfCraftingOutput(craftingPickups, txtOutputId)
         end
       end, false)
@@ -237,6 +275,41 @@ if REPENTOGON then
     
     ImGui.AddElement('shenanigansWindowCrafting', '', ImGuiElement.SeparatorText, 'Output')
     ImGui.AddText('shenanigansWindowCrafting', 'Refresh once you are in a run!', true, txtOutputId)
+    
+    ImGui.AddElement('shenanigansWindowCrafting', '', ImGuiElement.SeparatorText, 'Log')
+    for i = 1, 6 do
+      local btnLogId = 'shenanigansBtnCraftingLog' .. i
+      local btnLogLbl = i == 1 and 'Last ' .. i or i
+      ImGui.AddButton('shenanigansWindowCrafting', btnLogId, btnLogLbl, function()
+        if Isaac.IsInGame() then
+          local seeds = game:GetSeeds()
+          local arr = {}
+          for j in ipairs(craftingOptions) do -- 1-29
+            table.insert(arr, j)
+          end
+          local n = #arr
+          local r = i
+          local tblPrefix = { table.unpack(craftingPickups, 1, 8 - i) }
+          Isaac.DebugString('Last ' .. i .. ' | Seed: ' .. seeds:GetStartSeedString())
+          mod:doCombinationRepetition(arr, n, r, tblPrefix)
+          ImGui.PushNotification('Recipes logged to file', ImGuiNotificationType.SUCCESS, 5000)
+        else
+          ImGui.PushNotification('Start a run to log recipes!', ImGuiNotificationType.ERROR, 5000)
+        end
+      end, false)
+      if i < 6 then
+        ImGui.AddElement('shenanigansWindowCrafting', '', ImGuiElement.SameLine, '')
+      else
+        local btnLogHelp = 'There\'s more than 30 million recipes in total. Generating all of them has terrible performance. This will let you set static choices in the first few slots and log all the options for the last x.\n'
+        btnLogHelp = btnLogHelp .. '\nLast 1 = 29 recipes'
+        btnLogHelp = btnLogHelp .. '\nLast 2 = 435 recipes'
+        btnLogHelp = btnLogHelp .. '\nLast 3 = 4,495 recipes'
+        btnLogHelp = btnLogHelp .. '\nLast 4 = 35,960 recipes'
+        btnLogHelp = btnLogHelp .. '\nLast 5 = 237,336 recipes (can freeze ~10s)'
+        btnLogHelp = btnLogHelp .. '\nLast 6 = 1,344,904 recipes (can freeze ~1m)'
+        ImGui.SetHelpmarker(btnLogId, btnLogHelp)
+      end
+    end
   end
   
   mod:setupImGuiMenu()
