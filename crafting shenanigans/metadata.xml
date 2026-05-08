@@ -14,7 +14,7 @@ More info: https://bindingofisaacrebirth.wiki.gg/wiki/Bag_of_Crafting
 Update: There's a new option to log recipes to the log file. There's more than 30 million in total. Generating all of them has terrible performance. This option will require you to set static choices for at least the first two slots.
 
 The log file is located here: C:\Users\username\Documents\My Games\Binding of Isaac Repentance+\log.txt</description>
-    <version>1.5</version>
+    <version>1.6</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
 </metadata>
