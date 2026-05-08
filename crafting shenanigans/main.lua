@@ -34,6 +34,38 @@ if REPENTOGON then
     [BagOfCraftingPickup.BOC_POOP] = '_',
   }
   
+  mod.craftingQualities = {
+    [BagOfCraftingPickup.BOC_RED_HEART] = 1,
+    [BagOfCraftingPickup.BOC_SOUL_HEART] = 4,
+    [BagOfCraftingPickup.BOC_BLACK_HEART] = 5,
+    [BagOfCraftingPickup.BOC_ETERNAL_HEART] = 5,
+    [BagOfCraftingPickup.BOC_GOLD_HEART] = 5,
+    [BagOfCraftingPickup.BOC_BONE_HEART] = 5,
+    [BagOfCraftingPickup.BOC_ROTTEN_HEART] = 1,
+    [BagOfCraftingPickup.BOC_PENNY] = 1,
+    [BagOfCraftingPickup.BOC_NICKEL] = 3,
+    [BagOfCraftingPickup.BOC_DIME] = 5,
+    [BagOfCraftingPickup.BOC_LUCKY_PENNY] = 8,
+    [BagOfCraftingPickup.BOC_KEY] = 2,
+    [BagOfCraftingPickup.BOC_GOLD_KEY] = 7,
+    [BagOfCraftingPickup.BOC_CHARGED_KEY] = 5,
+    [BagOfCraftingPickup.BOC_BOMB] = 2,
+    [BagOfCraftingPickup.BOC_GOLD_BOMB] = 7,
+    [BagOfCraftingPickup.BOC_GIGA_BOMB] = 10,
+    [BagOfCraftingPickup.BOC_MINI_BATTERY] = 2,
+    [BagOfCraftingPickup.BOC_BATTERY] = 4,
+    [BagOfCraftingPickup.BOC_MEGA_BATTERY] = 8,
+    [BagOfCraftingPickup.BOC_CARD] = 2,
+    [BagOfCraftingPickup.BOC_PILL] = 2,
+    [BagOfCraftingPickup.BOC_RUNE] = 4,
+    [BagOfCraftingPickup.BOC_DICE_SHARD] = 4,
+    [BagOfCraftingPickup.BOC_CRACKED_KEY] = 2,
+    [BagOfCraftingPickup.BOC_GOLD_PENNY] = 7,
+    [BagOfCraftingPickup.BOC_GOLD_PILL] = 7,
+    [BagOfCraftingPickup.BOC_GOLD_BATTERY] = 7,
+    [BagOfCraftingPickup.BOC_POOP] = 0,
+  }
+  
   function mod:onModsLoaded()
     mod:setupImGui()
   end
@@ -109,6 +141,47 @@ if REPENTOGON then
     return nil
   end
   
+  function mod:updateBagOfCraftingTotal(craftingPickups, txtTotalId)
+    local total = 0
+    for _, v in ipairs(craftingPickups) do
+      total = total + mod.craftingQualities[v]
+    end
+    local s = 'Quality: '
+    if total >= 0 and total <= 8 then
+      s = s .. '0-1'
+    elseif total >= 9 and total <= 14 then
+      s = s .. '0-2'
+    elseif total >= 15 and total <= 18 then
+      s = s .. '1-2'
+    elseif total >= 19 and total <= 22 then
+      s = s .. '2-3'
+    elseif total >= 23 and total <= 26 then
+      s = s .. '2-4'
+    elseif total >= 27 and total <= 34 then
+      s = s .. '3-4'
+    elseif total >= 35 then
+      s = s .. '4-4'
+    end
+    s = s .. ' (sp: '
+    if total >= 0 and total <= 13 then
+      s = s .. '0-1'
+    elseif total >= 14 and total <= 19 then
+      s = s .. '0-2'
+    elseif total >= 20 and total <= 23 then
+      s = s .. '1-2'
+    elseif total >= 24 and total <= 27 then
+      s = s .. '2-3'
+    elseif total >= 28 and total <= 31 then
+      s = s .. '2-4'
+    elseif total >= 32 and total <= 39 then
+      s = s .. '3-4'
+    elseif total >= 40 then
+      s = s .. '4-4'
+    end
+    s = s .. ')'
+    ImGui.UpdateText(txtTotalId, 'Total: ' .. total .. ' | ' .. s)
+  end
+  
   function mod:calculateBagOfCraftingOutput(craftingPickups, txtOutputId)
     if Isaac.IsInGame() then
       local itemConfig = Isaac.GetItemConfig()
@@ -172,6 +245,10 @@ if REPENTOGON then
     ImGui.CreateWindow('shenanigansWindowCrafting', 'Crafting Shenanigans')
     ImGui.LinkWindowToElement('shenanigansWindowCrafting', 'shenanigansMenuItemCrafting')
     
+    ImGui.AddTabBar('shenanigansWindowCrafting', 'shenanigansTabBarCrafting')
+    ImGui.AddTab('shenanigansTabBarCrafting', 'shenanigansTabCraftingCalculate', 'Calculate')
+    ImGui.AddTab('shenanigansTabBarCrafting', 'shenanigansTabCraftingDebug', 'Debug')
+    
     local craftingOptions = {}                                   -- BagOfCraftingPickup
     table.insert(craftingOptions, 'Red Heart (1)')               -- 1 BOC_RED_HEART
     table.insert(craftingOptions, 'Soul Heart (4)')              -- 2 BOC_SOUL_HEART
@@ -206,17 +283,21 @@ if REPENTOGON then
     local craftingPickups = { 1, 1, 1, 1, 1, 1, 1, 1 }
     local txtInputId = 'shenanigansTxtCraftingInput'
     local txtOutputId = 'shenanigansTxtCraftingOutput'
-    ImGui.AddElement('shenanigansWindowCrafting', '', ImGuiElement.SeparatorText, 'Bag of Crafting')
+    local txtTotalId = 'shenanigansTxtCraftingTotal'
+    ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SeparatorText, 'Bag of Crafting')
     for i = 1, 8 do
-      ImGui.AddCombobox('shenanigansWindowCrafting', 'shenanigansCmbCraftingPickup' .. i, '', function(j)
+      ImGui.AddCombobox('shenanigansTabCraftingCalculate', 'shenanigansCmbCraftingPickup' .. i, '', function(j)
         craftingPickups[i] = j + 1
         ImGui.UpdateData(txtInputId, ImGuiData.Value, mod:buildXmlStr(craftingPickups))
         mod:calculateBagOfCraftingOutput(craftingPickups, txtOutputId)
+        mod:updateBagOfCraftingTotal(craftingPickups, txtTotalId)
       end, craftingOptions, 0, true)
     end
+    ImGui.AddText('shenanigansTabCraftingCalculate', '', true, txtTotalId)
+    mod:updateBagOfCraftingTotal(craftingPickups, txtTotalId)
     
-    ImGui.AddElement('shenanigansWindowCrafting', '', ImGuiElement.SeparatorText, 'XML Formatting')
-    ImGui.AddInputText('shenanigansWindowCrafting', txtInputId, '', nil, mod:buildXmlStr(craftingPickups), '')
+    ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SeparatorText, 'XML Formatting')
+    ImGui.AddInputText('shenanigansTabCraftingCalculate', txtInputId, '', nil, mod:buildXmlStr(craftingPickups), '')
     ImGui.AddCallback(txtInputId, ImGuiCallback.DeactivatedAfterEdit, function(s)
       s = string.match(s, '^%s*(.-)%s*$') -- http://lua-users.org/wiki/StringTrim
       
@@ -241,6 +322,7 @@ if REPENTOGON then
       
       ImGui.UpdateData(txtInputId, ImGuiData.Value, mod:buildXmlStr(craftingPickups))
       mod:calculateBagOfCraftingOutput(craftingPickups, txtOutputId)
+      mod:updateBagOfCraftingTotal(craftingPickups, txtTotalId)
     end)
     local txtInputHelp = 'Formatting from recipes.xml\n'
     for i, v in ipairs(mod.craftingXmlMap) do
@@ -248,10 +330,10 @@ if REPENTOGON then
     end
     ImGui.SetHelpmarker(txtInputId, txtInputHelp)
     
-    ImGui.AddElement('shenanigansWindowCrafting', '', ImGuiElement.SeparatorText, 'Players')
+    ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SeparatorText, 'Players (Copy)')
     for i = 1, 8 do
-      local btnPlayerId = 'shenanigansBtnCraftingPlayer' .. i
-      ImGui.AddButton('shenanigansWindowCrafting', btnPlayerId, i, function()
+      local btnPlayerId = 'shenanigansBtnCraftingPlayerCopy' .. i
+      ImGui.AddButton('shenanigansTabCraftingCalculate', btnPlayerId, i, function()
         if Isaac.IsInGame() then
           local player = game:GetPlayer(i - 1)
           for j = 1, 8 do
@@ -264,23 +346,25 @@ if REPENTOGON then
           end
           ImGui.UpdateData(txtInputId, ImGuiData.Value, mod:buildXmlStr(craftingPickups))
           mod:calculateBagOfCraftingOutput(craftingPickups, txtOutputId)
+          mod:updateBagOfCraftingTotal(craftingPickups, txtTotalId)
+        else
+          ImGui.PushNotification('Start a run to access players!', ImGuiNotificationType.ERROR, 5000)
         end
       end, false)
       if i < 8 then
-        ImGui.AddElement('shenanigansWindowCrafting', '', ImGuiElement.SameLine, '')
+        ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SameLine, '')
       else
         ImGui.SetHelpmarker(btnPlayerId, 'Copy the player\'s bag of crafting')
       end
     end
     
-    ImGui.AddElement('shenanigansWindowCrafting', '', ImGuiElement.SeparatorText, 'Output')
-    ImGui.AddText('shenanigansWindowCrafting', 'Refresh once you are in a run!', true, txtOutputId)
+    ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SeparatorText, 'Output')
+    ImGui.AddText('shenanigansTabCraftingCalculate', 'Refresh once you are in a run!', true, txtOutputId)
     
-    ImGui.AddElement('shenanigansWindowCrafting', '', ImGuiElement.SeparatorText, 'Log')
+    ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SeparatorText, 'Log')
     for i = 1, 6 do
       local btnLogId = 'shenanigansBtnCraftingLog' .. i
-      local btnLogLbl = i == 1 and 'Last ' .. i or i
-      ImGui.AddButton('shenanigansWindowCrafting', btnLogId, btnLogLbl, function()
+      ImGui.AddButton('shenanigansTabCraftingCalculate', btnLogId, i == 1 and 'Last ' .. i or i, function()
         if Isaac.IsInGame() then
           local seeds = game:GetSeeds()
           local arr = {}
@@ -298,7 +382,7 @@ if REPENTOGON then
         end
       end, false)
       if i < 6 then
-        ImGui.AddElement('shenanigansWindowCrafting', '', ImGuiElement.SameLine, '')
+        ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SameLine, '')
       else
         local btnLogHelp = 'There\'s more than 30 million recipes in total. Generating all of them has terrible performance. This will let you set static choices in the first few slots and log all the options for the last x.\n'
         btnLogHelp = btnLogHelp .. '\nLast 1 = 29 recipes'
@@ -308,6 +392,67 @@ if REPENTOGON then
         btnLogHelp = btnLogHelp .. '\nLast 5 = 237,336 recipes (can freeze ~10s)'
         btnLogHelp = btnLogHelp .. '\nLast 6 = 1,344,904 recipes (can freeze ~1m)'
         ImGui.SetHelpmarker(btnLogId, btnLogHelp)
+      end
+    end
+    
+    local itemConfig = Isaac.GetItemConfig()
+    local itemOverride = CollectibleType.COLLECTIBLE_NULL -- 0
+    local itemOverrides = { '(Calculate default item)' }
+    for i = 1, #itemConfig:GetCollectibles() - 1 do
+      local collectibleConfig = itemConfig:GetCollectible(i)
+      if collectibleConfig then
+        table.insert(itemOverrides, collectibleConfig.ID .. ' - ' .. mod:localize('Items', collectibleConfig.Name) .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. collectibleConfig.CraftingQuality)
+      end
+    end
+    ImGui.AddElement('shenanigansTabCraftingDebug', '', ImGuiElement.SeparatorText, 'Players (Update)')
+    ImGui.AddCombobox('shenanigansTabCraftingDebug', 'shenanigansCmbCraftingOverride', '', function(_, s)
+      local temp = tonumber(string.match(s, '^(%d+)'))
+      itemOverride = temp or CollectibleType.COLLECTIBLE_NULL
+    end, itemOverrides, 0, false)
+    for i = 1, 8 do
+      local btnPlayerId = 'shenanigansBtnCraftingPlayerUpdate' .. i
+      ImGui.AddButton('shenanigansTabCraftingDebug', btnPlayerId, i, function()
+        if Isaac.IsInGame() then
+          local player = game:GetPlayer(i - 1)
+          player:SetBagOfCraftingContent(craftingPickups)
+          if itemOverride > CollectibleType.COLLECTIBLE_NULL then
+            player:SetBagOfCraftingOutput(itemOverride)
+          end
+          ImGui.PushNotification('Player\'s bag of crafting updated', ImGuiNotificationType.SUCCESS, 5000)
+        else
+          ImGui.PushNotification('Start a run to access players!', ImGuiNotificationType.ERROR, 5000)
+        end
+      end, false)
+      if i < 8 then
+        ImGui.AddElement('shenanigansTabCraftingDebug', '', ImGuiElement.SameLine, '')
+      else
+        ImGui.SetHelpmarker(btnPlayerId, 'Update the player\'s bag of crafting with the pickups from the calculate tab (Optional: override the calculated item)')
+      end
+    end
+    
+    local numToRemove = 8
+    local numsToRemove = { 'Last 1', 'Last 2', 'Last 3', 'Last 4', 'Last 5', 'Last 6', 'Last 7', 'Last 8' }
+    ImGui.AddElement('shenanigansTabCraftingDebug', '', ImGuiElement.SeparatorText, 'Players (Clear)')
+    ImGui.AddCombobox('shenanigansTabCraftingDebug', 'shenanigansCmbCraftingClear', '', function(i)
+      numToRemove = i + 1
+    end, numsToRemove, numToRemove - 1, true)
+    for i = 1, 8 do
+      local btnPlayerId = 'shenanigansBtnCraftingPlayerClear' .. i
+      ImGui.AddButton('shenanigansTabCraftingDebug', btnPlayerId, i, function()
+        if Isaac.IsInGame() then
+          local player = game:GetPlayer(i - 1)
+          for i = 8 - 1, 8 - numToRemove, -1 do
+            player:SetBagOfCraftingSlot(i, BagOfCraftingPickup.BOC_NONE)
+          end
+          ImGui.PushNotification('Player\'s bag of crafting cleared', ImGuiNotificationType.SUCCESS, 5000)
+        else
+          ImGui.PushNotification('Start a run to access players!', ImGuiNotificationType.ERROR, 5000)
+        end
+      end, false)
+      if i < 8 then
+        ImGui.AddElement('shenanigansTabCraftingDebug', '', ImGuiElement.SameLine, '')
+      else
+        ImGui.SetHelpmarker(btnPlayerId, 'Clear the last x slots from the player\'s bag of crafting (8 to clear the entire bag)')
       end
     end
   end
