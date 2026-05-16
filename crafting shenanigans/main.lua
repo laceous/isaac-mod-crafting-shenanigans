@@ -441,8 +441,8 @@ if REPENTOGON then
       ImGui.AddButton('shenanigansTabCraftingDebug', btnPlayerId, i, function()
         if Isaac.IsInGame() then
           local player = game:GetPlayer(i - 1)
-          for i = 8 - 1, 8 - numToRemove, -1 do
-            player:SetBagOfCraftingSlot(i, BagOfCraftingPickup.BOC_NONE)
+          for j = 8 - 1, 8 - numToRemove, -1 do
+            player:SetBagOfCraftingSlot(j, BagOfCraftingPickup.BOC_NONE)
           end
           ImGui.PushNotification('Player\'s bag of crafting cleared', ImGuiNotificationType.SUCCESS, 5000)
         else
