@@ -249,36 +249,36 @@ if REPENTOGON then
     ImGui.AddTab('shenanigansTabBarCrafting', 'shenanigansTabCraftingCalculate', 'Calculate')
     ImGui.AddTab('shenanigansTabBarCrafting', 'shenanigansTabCraftingDebug', 'Debug')
     
-    local craftingOptions = {}                                   -- BagOfCraftingPickup
-    table.insert(craftingOptions, 'Red Heart (1)')               -- 1 BOC_RED_HEART
-    table.insert(craftingOptions, 'Soul Heart (4)')              -- 2 BOC_SOUL_HEART
-    table.insert(craftingOptions, 'Black Heart (5|Devil)')       -- 3 BOC_BLACK_HEART
-    table.insert(craftingOptions, 'Eternal Heart (5|Angel)')     -- 4 BOC_ETERNAL_HEART
-    table.insert(craftingOptions, 'Gold Heart (5|Golden Chest)') -- 5 BOC_GOLD_HEART
-    table.insert(craftingOptions, 'Bone Heart (5|Secret)')       -- 6 BOC_BONE_HEART
-    table.insert(craftingOptions, 'Rotten Heart (1|Curse)')      -- 7 BOC_ROTTEN_HEART
-    table.insert(craftingOptions, 'Penny (1)')                   -- 8 BOC_PENNY
-    table.insert(craftingOptions, 'Nickel (3)')                  -- 9 BOC_NICKEL
-    table.insert(craftingOptions, 'Dime (5)')                    -- 10 BOC_DIME
-    table.insert(craftingOptions, 'Lucky Penny (8)')             -- 11 BOC_LUCKY_PENNY
-    table.insert(craftingOptions, 'Key (2)')                     -- 12 BOC_KEY
-    table.insert(craftingOptions, 'Golden Key (7)')              -- 13 BOC_GOLD_KEY
-    table.insert(craftingOptions, 'Charged Key (5)')             -- 14 BOC_CHARGED_KEY
-    table.insert(craftingOptions, 'Bomb (2)')                    -- 15 BOC_BOMB
-    table.insert(craftingOptions, 'Golden Bomb (7)')             -- 16 BOC_GOLD_BOMB
-    table.insert(craftingOptions, 'Giga Bomb (10)')              -- 17 BOC_GIGA_BOMB
-    table.insert(craftingOptions, 'Micro Battery (2)')           -- 18 BOC_MINI_BATTERY
-    table.insert(craftingOptions, 'Lil Battery (4)')             -- 19 BOC_BATTERY
-    table.insert(craftingOptions, 'Mega Battery (8)')            -- 20 BOC_MEGA_BATTERY
-    table.insert(craftingOptions, 'Card (2)')                    -- 21 BOC_CARD
-    table.insert(craftingOptions, 'Pill (2)')                    -- 22 BOC_PILL
-    table.insert(craftingOptions, 'Rune (4|Planetarium)')        -- 23 BOC_RUNE
-    table.insert(craftingOptions, 'Dice Shard (4)')              -- 24 BOC_DICE_SHARD
-    table.insert(craftingOptions, 'Cracked Key (2|Red Chest)')   -- 25 BOC_CRACKED_KEY
-    table.insert(craftingOptions, 'Golden Penny (7)')            -- 26 BOC_GOLD_PENNY
-    table.insert(craftingOptions, 'Golden Pill (7)')             -- 27 BOC_GOLD_PILL
-    table.insert(craftingOptions, 'Golden Battery (7)')          -- 28 BOC_GOLD_BATTERY
-    table.insert(craftingOptions, 'Poop Nugget (0|Shell Game)')  -- 29 BOC_POOP
+    local craftingOptions = {}                                            -- BagOfCraftingPickup
+    table.insert(craftingOptions, '\u{f004} Red Heart (1)')               -- 1 BOC_RED_HEART
+    table.insert(craftingOptions, '\u{f004} Soul Heart (4)')              -- 2 BOC_SOUL_HEART
+    table.insert(craftingOptions, '\u{f004} Black Heart (5|Devil)')       -- 3 BOC_BLACK_HEART
+    table.insert(craftingOptions, '\u{f004} Eternal Heart (5|Angel)')     -- 4 BOC_ETERNAL_HEART
+    table.insert(craftingOptions, '\u{f004} Gold Heart (5|Golden Chest)') -- 5 BOC_GOLD_HEART
+    table.insert(craftingOptions, '\u{f004} Bone Heart (5|Secret)')       -- 6 BOC_BONE_HEART
+    table.insert(craftingOptions, '\u{f7a9} Rotten Heart (1|Curse)')      -- 7 BOC_ROTTEN_HEART
+    table.insert(craftingOptions, '\u{f51e} Penny (1)')                   -- 8 BOC_PENNY
+    table.insert(craftingOptions, '\u{f51e} Nickel (3)')                  -- 9 BOC_NICKEL
+    table.insert(craftingOptions, '\u{f51e} Dime (5)')                    -- 10 BOC_DIME
+    table.insert(craftingOptions, '\u{f51e} Lucky Penny (8)')             -- 11 BOC_LUCKY_PENNY
+    table.insert(craftingOptions, '\u{f084} Key (2)')                     -- 12 BOC_KEY
+    table.insert(craftingOptions, '\u{f084} Golden Key (7)')              -- 13 BOC_GOLD_KEY
+    table.insert(craftingOptions, '\u{f084} Charged Key (5)')             -- 14 BOC_CHARGED_KEY
+    table.insert(craftingOptions, '\u{f1e2} Bomb (2)')                    -- 15 BOC_BOMB
+    table.insert(craftingOptions, '\u{f1e2} Golden Bomb (7)')             -- 16 BOC_GOLD_BOMB
+    table.insert(craftingOptions, '\u{f1e2} Giga Bomb (10)')              -- 17 BOC_GIGA_BOMB
+    table.insert(craftingOptions, '\u{f243} Micro Battery (2)')           -- 18 BOC_MINI_BATTERY
+    table.insert(craftingOptions, '\u{f242} Lil Battery (4)')             -- 19 BOC_BATTERY
+    table.insert(craftingOptions, '\u{f240} Mega Battery (8)')            -- 20 BOC_MEGA_BATTERY
+    table.insert(craftingOptions, '\u{f2bb} Card (2)')                    -- 21 BOC_CARD
+    table.insert(craftingOptions, '\u{f46b} Pill (2)')                    -- 22 BOC_PILL
+    table.insert(craftingOptions, '\u{f3a5} Rune (4|Planetarium)')        -- 23 BOC_RUNE
+    table.insert(craftingOptions, '\u{f522} Dice Shard (4)')              -- 24 BOC_DICE_SHARD
+    table.insert(craftingOptions, '\u{f084} Cracked Key (2|Red Chest)')   -- 25 BOC_CRACKED_KEY
+    table.insert(craftingOptions, '\u{f51e} Golden Penny (7)')            -- 26 BOC_GOLD_PENNY
+    table.insert(craftingOptions, '\u{f46b} Golden Pill (7)')             -- 27 BOC_GOLD_PILL
+    table.insert(craftingOptions, '\u{f242} Golden Battery (7)')          -- 28 BOC_GOLD_BATTERY
+    table.insert(craftingOptions, '\u{f2fe} Poop Nugget (0|Shell Game)')  -- 29 BOC_POOP
     
     local craftingPickups = { 1, 1, 1, 1, 1, 1, 1, 1 }
     local txtInputId = 'shenanigansTxtCraftingInput'
