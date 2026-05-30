@@ -93,8 +93,7 @@ if REPENTOGON then
           table.insert(recipe, invC)
         end
         table.sort(recipe)
-        table.insert(recipe, collectible)
-        table.insert(mod.craftingXmlRecipes, recipe)
+        mod.craftingXmlRecipes[table.concat(recipe, ',')] = collectible
       end
       
       ::continue::
@@ -158,33 +157,15 @@ if REPENTOGON then
   end
   
   function mod:isXmlRecipe(craftingPickups, collectible)
-    local craftingPickupsCopy = mod:copyTbl(craftingPickups)
+    local craftingPickupsCopy = { table.unpack(craftingPickups) }
     table.sort(craftingPickupsCopy)
     
-    for _, recipe in ipairs(mod.craftingXmlRecipes) do
-      if recipe[1] == craftingPickupsCopy[1] and
-         recipe[2] == craftingPickupsCopy[2] and
-         recipe[3] == craftingPickupsCopy[3] and
-         recipe[4] == craftingPickupsCopy[4] and
-         recipe[5] == craftingPickupsCopy[5] and
-         recipe[6] == craftingPickupsCopy[6] and
-         recipe[7] == craftingPickupsCopy[7] and
-         recipe[8] == craftingPickupsCopy[8] and
-         recipe[9] == collectible
-      then
-        return true
-      end
+    local recipe = mod.craftingXmlRecipes[table.concat(craftingPickupsCopy, ',')]
+    if recipe and recipe == collectible then
+      return true
     end
     
     return false
-  end
-  
-  function mod:copyTbl(tbl)
-    local newTbl = {}
-    for k, v in pairs(tbl) do
-      newTbl[k] = v
-    end
-    return newTbl
   end
   
   function mod:buildXmlStr(craftingPickups)
