@@ -254,10 +254,7 @@ if REPENTOGON then
   
   function mod:doCombinationRepetitionUtil(chosen, arr, index, r, start, last, tblPrefix)
     if index == r + 1 then
-      local temp = {}
-      for _, v in ipairs(tblPrefix) do
-        table.insert(temp, v)
-      end
+      local temp = { table.unpack(tblPrefix) }
       for i = 1, r do
         table.insert(temp, arr[chosen[i]])
       end
