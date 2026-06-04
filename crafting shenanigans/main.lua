@@ -93,7 +93,10 @@ if REPENTOGON then
           table.insert(recipe, invC)
         end
         table.sort(recipe)
-        mod.craftingXmlRecipes[table.concat(recipe, ',')] = collectible
+        local strRecipe = table.concat(recipe, ',')
+        if mod.craftingXmlRecipes[strRecipe] == nil then
+          mod.craftingXmlRecipes[strRecipe] = collectible
+        end
       end
       
       ::continue::
