@@ -71,6 +71,49 @@ if REPENTOGON then
     [BagOfCraftingPickup.BOC_POOP] = 0,
   }
   
+  mod.itemTypeNames = {
+    [ItemType.ITEM_NULL] = 'Null',
+    [ItemType.ITEM_PASSIVE] = 'Passive',
+    [ItemType.ITEM_TRINKET] = 'Trinket',
+    [ItemType.ITEM_ACTIVE] = 'Active',
+    [ItemType.ITEM_FAMILIAR] = 'Familiar',
+  }
+  
+  mod.itemPoolNames = {
+    [ItemPoolType.POOL_NULL] = 'Null',
+    [ItemPoolType.POOL_TREASURE] = 'Treasure',
+    [ItemPoolType.POOL_SHOP] = 'Shop',
+    [ItemPoolType.POOL_BOSS] = 'Boss',
+    [ItemPoolType.POOL_DEVIL] = 'Devil',
+    [ItemPoolType.POOL_ANGEL] = 'Angel',
+    [ItemPoolType.POOL_SECRET] = 'Secret',
+    [ItemPoolType.POOL_LIBRARY] = 'Library',
+    [ItemPoolType.POOL_SHELL_GAME] = 'Shell Game',
+    [ItemPoolType.POOL_GOLDEN_CHEST] = 'Golden Chest',
+    [ItemPoolType.POOL_RED_CHEST] = 'Red Chest',
+    [ItemPoolType.POOL_BEGGAR] = 'Beggar',
+    [ItemPoolType.POOL_DEMON_BEGGAR] = 'Demon Beggar',
+    [ItemPoolType.POOL_CURSE] = 'Curse',
+    [ItemPoolType.POOL_KEY_MASTER] = 'Key Master',
+    [ItemPoolType.POOL_BATTERY_BUM] = 'Battery Bum',
+    [ItemPoolType.POOL_MOMS_CHEST] = 'Mom\'s Chest',
+    [ItemPoolType.POOL_GREED_TREASURE] = 'Treasure',
+    [ItemPoolType.POOL_GREED_BOSS] = 'Boss',
+    [ItemPoolType.POOL_GREED_SHOP] = 'Shop',
+    [ItemPoolType.POOL_GREED_DEVIL] = 'Devil',
+    [ItemPoolType.POOL_GREED_ANGEL] = 'Angel',
+    [ItemPoolType.POOL_GREED_CURSE] = 'Curse',
+    [ItemPoolType.POOL_GREED_SECRET] = 'Secret',
+    [ItemPoolType.POOL_CRANE_GAME] = 'Crane Game',
+    [ItemPoolType.POOL_ULTRA_SECRET] = 'Ultra Secret',
+    [ItemPoolType.POOL_BOMB_BUM] = 'Bomb Bum',
+    [ItemPoolType.POOL_PLANETARIUM] = 'Planetarium',
+    [ItemPoolType.POOL_OLD_CHEST] = 'Old Chest',
+    [ItemPoolType.POOL_BABY_SHOP] = 'Baby Shop',
+    [ItemPoolType.POOL_WOODEN_CHEST] = 'Wooden Chest',
+    [ItemPoolType.POOL_ROTTEN_BEGGAR] = 'Rotten Beggar',
+  }
+  
   function mod:onModsLoaded()
     for k, v in pairs(mod.craftingXmlMap) do
       mod.craftingXmlMapInv[v] = k
@@ -111,52 +154,11 @@ if REPENTOGON then
   end
   
   function mod:getItemTypeName(i)
-    local tbl = {
-      [ItemType.ITEM_NULL] = 'Null',
-      [ItemType.ITEM_PASSIVE] = 'Passive',
-      [ItemType.ITEM_TRINKET] = 'Trinket',
-      [ItemType.ITEM_ACTIVE] = 'Active',
-      [ItemType.ITEM_FAMILIAR] = 'Familiar',
-    }
-    return tbl[i] or i
+    return mod.itemTypeNames[i] or i
   end
   
   function mod:getItemPoolName(i)
-    local tbl = {
-      [ItemPoolType.POOL_NULL] = 'Null',
-      [ItemPoolType.POOL_TREASURE] = 'Treasure',
-      [ItemPoolType.POOL_SHOP] = 'Shop',
-      [ItemPoolType.POOL_BOSS] = 'Boss',
-      [ItemPoolType.POOL_DEVIL] = 'Devil',
-      [ItemPoolType.POOL_ANGEL] = 'Angel',
-      [ItemPoolType.POOL_SECRET] = 'Secret',
-      [ItemPoolType.POOL_LIBRARY] = 'Library',
-      [ItemPoolType.POOL_SHELL_GAME] = 'Shell Game',
-      [ItemPoolType.POOL_GOLDEN_CHEST] = 'Golden Chest',
-      [ItemPoolType.POOL_RED_CHEST] = 'Red Chest',
-      [ItemPoolType.POOL_BEGGAR] = 'Beggar',
-      [ItemPoolType.POOL_DEMON_BEGGAR] = 'Demon Beggar',
-      [ItemPoolType.POOL_CURSE] = 'Curse',
-      [ItemPoolType.POOL_KEY_MASTER] = 'Key Master',
-      [ItemPoolType.POOL_BATTERY_BUM] = 'Battery Bum',
-      [ItemPoolType.POOL_MOMS_CHEST] = 'Mom\'s Chest',
-      [ItemPoolType.POOL_GREED_TREASURE] = 'Treasure',
-      [ItemPoolType.POOL_GREED_BOSS] = 'Boss',
-      [ItemPoolType.POOL_GREED_SHOP] = 'Shop',
-      [ItemPoolType.POOL_GREED_DEVIL] = 'Devil',
-      [ItemPoolType.POOL_GREED_ANGEL] = 'Angel',
-      [ItemPoolType.POOL_GREED_CURSE] = 'Curse',
-      [ItemPoolType.POOL_GREED_SECRET] = 'Secret',
-      [ItemPoolType.POOL_CRANE_GAME] = 'Crane Game',
-      [ItemPoolType.POOL_ULTRA_SECRET] = 'Ultra Secret',
-      [ItemPoolType.POOL_BOMB_BUM] = 'Bomb Bum',
-      [ItemPoolType.POOL_PLANETARIUM] = 'Planetarium',
-      [ItemPoolType.POOL_OLD_CHEST] = 'Old Chest',
-      [ItemPoolType.POOL_BABY_SHOP] = 'Baby Shop',
-      [ItemPoolType.POOL_WOODEN_CHEST] = 'Wooden Chest',
-      [ItemPoolType.POOL_ROTTEN_BEGGAR] = 'Rotten Beggar',
-    }
-    return tbl[i] or i
+    return mod.itemPoolNames[i] or i
   end
   
   function mod:isXmlRecipe(craftingPickups, collectible)
