@@ -2,8 +2,6 @@ local mod = RegisterMod('Crafting Shenanigans', 1)
 local game = Game()
 
 if REPENTOGON then
-  mod.checkRecipesXml = true
-  
   mod.craftingXmlMap = {
     [BagOfCraftingPickup.BOC_RED_HEART] = 'h',
     [BagOfCraftingPickup.BOC_SOUL_HEART] = 's',
@@ -113,6 +111,9 @@ if REPENTOGON then
     [ItemPoolType.POOL_WOODEN_CHEST] = 'Wooden Chest',
     [ItemPoolType.POOL_ROTTEN_BEGGAR] = 'Rotten Beggar',
   }
+  
+  mod.logLines = {}
+  mod.numLogLines = 0
   
   function mod:onModsLoaded()
     for k, v in pairs(mod.craftingXmlMap) do
@@ -226,7 +227,7 @@ if REPENTOGON then
     if Isaac.IsInGame() then
       local itemConfig = Isaac.GetItemConfig()
       local collectible, itemPool = EntityPlayer.CalculateBagOfCraftingOutput(craftingPickups)
-      local itemPoolName = (mod.checkRecipesXml and itemPool == ItemPoolType.POOL_TREASURE and mod:isXmlRecipe(craftingPickups, collectible)) and 'XML' or mod:getItemPoolName(itemPool)
+      local itemPoolName = (itemPool == ItemPoolType.POOL_TREASURE and mod:isXmlRecipe(craftingPickups, collectible)) and 'XML' or mod:getItemPoolName(itemPool)
       local collectibleConfig = itemConfig:GetCollectible(collectible)
       if collectibleConfig then
         ImGui.UpdateText(txtOutputId, mod:localize('Items', collectibleConfig.Name) .. ' (' .. collectibleConfig.ID .. ') | ' .. itemPoolName .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. collectibleConfig.CraftingQuality) -- Quality
@@ -239,14 +240,34 @@ if REPENTOGON then
   end
   
   function mod:logBagOfCraftingOutput(craftingPickups)
-    local itemConfig = Isaac.GetItemConfig()
-    local collectible, itemPool = EntityPlayer.CalculateBagOfCraftingOutput(craftingPickups)
-    local itemPoolName = (mod.checkRecipesXml and itemPool == ItemPoolType.POOL_TREASURE and mod:isXmlRecipe(craftingPickups, collectible)) and 'XML' or mod:getItemPoolName(itemPool)
-    local collectibleConfig = itemConfig:GetCollectible(collectible)
-    if collectibleConfig then
-      Isaac.DebugString(mod:buildXmlStr(craftingPickups) .. ' | ' .. mod:localize('Items', collectibleConfig.Name) .. ' (' .. collectibleConfig.ID .. ') | ' .. itemPoolName .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. collectibleConfig.CraftingQuality)
+    if craftingPickups then
+      if mod.numLogLines == 0 then
+        table.insert(mod.logLines, '')
+      end
+      
+      local itemConfig = Isaac.GetItemConfig()
+      local collectible, itemPool = EntityPlayer.CalculateBagOfCraftingOutput(craftingPickups)
+      local itemPoolName = (itemPool == ItemPoolType.POOL_TREASURE and mod:isXmlRecipe(craftingPickups, collectible)) and 'XML' or mod:getItemPoolName(itemPool)
+      local collectibleConfig = itemConfig:GetCollectible(collectible)
+      if collectibleConfig then
+        table.insert(mod.logLines, mod:buildXmlStr(craftingPickups) .. ' | ' .. mod:localize('Items', collectibleConfig.Name) .. ' (' .. collectibleConfig.ID .. ') | ' .. itemPoolName .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. collectibleConfig.CraftingQuality)
+      else
+        table.insert(mod.logLines, mod:buildXmlStr(craftingPickups) .. ' | ' .. collectible .. ' | ' .. itemPoolName)
+      end
+      mod.numLogLines = mod.numLogLines + 1
+      
+      -- this logs roughly 6000 bytes, out of the 10219 bytes allowed
+      if mod.numLogLines >= 100 then
+        Isaac.DebugString(table.concat(mod.logLines, '\n'))
+        mod.logLines = {}
+        mod.numLogLines = 0
+      end
     else
-      Isaac.DebugString(mod:buildXmlStr(craftingPickups) .. ' | ' .. collectible .. ' | ' .. itemPoolName)
+      if mod.numLogLines > 0 then
+        Isaac.DebugString(table.concat(mod.logLines, '\n'))
+        mod.logLines = {}
+        mod.numLogLines = 0
+      end
     end
   end
   
@@ -415,6 +436,7 @@ if REPENTOGON then
           local tblPrefix = { table.unpack(craftingPickups, 1, 8 - i) }
           Isaac.DebugString('Last ' .. i .. ' | Seed: ' .. seeds:GetStartSeedString())
           mod:doCombinationRepetition(arr, n, r, tblPrefix)
+          mod:logBagOfCraftingOutput()
           ImGui.PushNotification('Recipes logged to file', ImGuiNotificationType.SUCCESS, 5000)
         else
           ImGui.PushNotification('Start a run to log recipes!', ImGuiNotificationType.ERROR, 5000)
@@ -428,8 +450,8 @@ if REPENTOGON then
         btnLogHelp = btnLogHelp .. '\nLast 2 = 435 recipes'
         btnLogHelp = btnLogHelp .. '\nLast 3 = 4,495 recipes'
         btnLogHelp = btnLogHelp .. '\nLast 4 = 35,960 recipes'
-        btnLogHelp = btnLogHelp .. '\nLast 5 = 237,336 recipes (can freeze ~10s)'
-        btnLogHelp = btnLogHelp .. '\nLast 6 = 1,344,904 recipes (can freeze ~1m)'
+        btnLogHelp = btnLogHelp .. '\nLast 5 = 237,336 recipes (can freeze ~7s)'
+        btnLogHelp = btnLogHelp .. '\nLast 6 = 1,344,904 recipes (can freeze ~45s)'
         ImGui.SetHelpmarker(btnLogId, btnLogHelp)
       end
     end
@@ -494,13 +516,6 @@ if REPENTOGON then
         ImGui.SetHelpmarker(btnPlayerId, 'Clear the last x slots from the player\'s bag of crafting (8 to clear the entire bag)')
       end
     end
-    
-    local cmbCheckRecipesId = 'shenanigansCmbCraftingCheckRecipes'
-    ImGui.AddElement('shenanigansTabCraftingDebug', '', ImGuiElement.SeparatorText, 'Settings')
-    ImGui.AddCombobox('shenanigansTabCraftingDebug', cmbCheckRecipesId, '', function(i)
-      mod.checkRecipesXml = i == 1
-    end, { 'Do not check recipes.xml', 'Check recipes.xml' }, mod.checkRecipesXml and 1 or 0, true)
-    ImGui.SetHelpmarker(cmbCheckRecipesId, 'Check to see if a recipe came from the recipes.xml file. If you install a mod with lots of static recipes then this may become an expensive operation (especially when logging).')
   end
   
   mod:setupImGuiMenu()
