@@ -330,7 +330,7 @@ if REPENTOGON then
     table.insert(craftingOptions, '\u{f243} Micro Battery (2)')           -- 18 BOC_MINI_BATTERY
     table.insert(craftingOptions, '\u{f242} Lil Battery (4)')             -- 19 BOC_BATTERY
     table.insert(craftingOptions, '\u{f240} Mega Battery (8)')            -- 20 BOC_MEGA_BATTERY
-    table.insert(craftingOptions, '\u{f2b9} Card (2)')                    -- 21 BOC_CARD
+    table.insert(craftingOptions, '\u{f2bb} Card (2)')                    -- 21 BOC_CARD
     table.insert(craftingOptions, '\u{f46b} Pill (2)')                    -- 22 BOC_PILL
     table.insert(craftingOptions, '\u{f3a5} Rune (4|Planetarium)')        -- 23 BOC_RUNE
     table.insert(craftingOptions, '\u{f522} Dice Shard (4)')              -- 24 BOC_DICE_SHARD
