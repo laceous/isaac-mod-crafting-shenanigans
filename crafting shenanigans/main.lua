@@ -280,11 +280,10 @@ if REPENTOGON then
   
   function mod:doCombinationRepetitionUtil(chosen, arr, index, r, start, last, tblPrefix)
     if index == r + 1 then
-      local temp = { table.unpack(tblPrefix) }
       for i = 1, r do
-        table.insert(temp, arr[chosen[i]])
+        tblPrefix[8 - r + i] = arr[chosen[i]]
       end
-      mod:logBagOfCraftingOutput(temp)
+      mod:logBagOfCraftingOutput(tblPrefix)
       return
     end
     
@@ -434,7 +433,7 @@ if REPENTOGON then
           local n = #arr
           local r = i
           local tblPrefix = { table.unpack(craftingPickups, 1, 8 - i) }
-          Isaac.DebugString('Last ' .. i .. ' | Seed: ' .. seeds:GetStartSeedString())
+          Isaac.DebugString(mod.Name .. ' | Last ' .. i .. ' | Seed: ' .. seeds:GetStartSeedString())
           mod:doCombinationRepetition(arr, n, r, tblPrefix)
           mod:logBagOfCraftingOutput()
           ImGui.PushNotification('Recipes logged to file', ImGuiNotificationType.SUCCESS, 5000)
@@ -450,8 +449,8 @@ if REPENTOGON then
         btnLogHelp = btnLogHelp .. '\nLast 2 = 435 recipes'
         btnLogHelp = btnLogHelp .. '\nLast 3 = 4,495 recipes'
         btnLogHelp = btnLogHelp .. '\nLast 4 = 35,960 recipes'
-        btnLogHelp = btnLogHelp .. '\nLast 5 = 237,336 recipes (can freeze ~7s)'
-        btnLogHelp = btnLogHelp .. '\nLast 6 = 1,344,904 recipes (can freeze ~45s)'
+        btnLogHelp = btnLogHelp .. '\nLast 5 = 237,336 recipes (can freeze ~6s)'
+        btnLogHelp = btnLogHelp .. '\nLast 6 = 1,344,904 recipes (can freeze ~40s)'
         ImGui.SetHelpmarker(btnLogId, btnLogHelp)
       end
     end
