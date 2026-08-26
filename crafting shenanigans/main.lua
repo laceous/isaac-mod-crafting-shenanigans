@@ -353,6 +353,7 @@ if REPENTOGON then
       end, craftingOptions, 0, true)
     end
     ImGui.AddText('shenanigansTabCraftingCalculate', '', true, txtTotalId)
+    ImGui.SetHelpmarker(txtTotalId, 'Special pools: angel, devil, and secret')
     mod:updateBagOfCraftingTotal(craftingPickups, txtTotalId)
     
     ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SeparatorText, 'XML Formatting')
