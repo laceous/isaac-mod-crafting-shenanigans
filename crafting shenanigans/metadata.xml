@@ -18,7 +18,7 @@ The log file is located here: C:\Users\username\Documents\My Games\Binding of Is
 Update x2: Add debug tab that lets you update/clear the player's bag of crafting.
 
 Update x3: Show preview of the calculated item below the first player.</description>
-    <version>1.20</version>
+    <version>1.21</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
 </metadata>

@@ -169,7 +169,15 @@ if REPENTOGON then
     local player = game:GetPlayer(0)
     local pos = Isaac.WorldToScreen(player.Position)
     pos.Y = pos.Y + 25
-    mod.sprite:Render(pos)
+    
+    if game:GetRoom():IsMirrorWorld() then
+      local wtrp320x280 = Isaac.WorldToRenderPosition(Vector(320, 280))
+      mod.sprite.FlipX = true
+      mod.sprite:Render(Vector(wtrp320x280.X*2 - pos.X, pos.Y))
+    else
+      mod.sprite.FlipX = false
+      mod.sprite:Render(pos)
+    end
   end
   
   function mod:localize(category, key)
