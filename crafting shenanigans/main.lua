@@ -2,6 +2,9 @@ local mod = RegisterMod('Crafting Shenanigans', 1)
 local game = Game()
 
 if REPENTOGON then
+  mod.sprite = Sprite()
+  mod.png = nil
+  
   mod.craftingXmlMap = {
     [BagOfCraftingPickup.BOC_RED_HEART] = 'h',
     [BagOfCraftingPickup.BOC_SOUL_HEART] = 's',
@@ -149,6 +152,26 @@ if REPENTOGON then
     mod:setupImGui()
   end
   
+  function mod:onRender()
+    if not (mod.png and ImGui.IsVisible() and ImGui.GetVisible('shenanigansWindowCrafting')) then
+      return
+    end
+    if not mod.sprite:IsLoaded() then
+      mod.sprite:Load('gfx/005.100_collectible.anm2', true)
+    end
+    if not mod.sprite:IsPlaying() then
+      mod.sprite:Play('ShopIdle', true)
+    end
+    if mod.sprite:GetLayer(1):GetSpritesheetPath() ~= mod.png then
+      mod.sprite:ReplaceSpritesheet(1, mod.png, true)
+    end
+    
+    local player = game:GetPlayer(0)
+    local pos = Isaac.WorldToScreen(player.Position)
+    pos.Y = pos.Y + 25
+    mod.sprite:Render(pos)
+  end
+  
   function mod:localize(category, key)
     local s = Isaac.GetString(category, key)
     return (s == nil or s == 'StringTable::InvalidCategory' or s == 'StringTable::InvalidKey') and key or s
@@ -231,11 +254,14 @@ if REPENTOGON then
       local collectibleConfig = itemConfig:GetCollectible(collectible)
       if collectibleConfig then
         ImGui.UpdateText(txtOutputId, mod:localize('Items', collectibleConfig.Name) .. ' (' .. collectibleConfig.ID .. ') | ' .. itemPoolName .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. collectibleConfig.CraftingQuality) -- Quality
+        mod.png = collectibleConfig.GfxFileName
       else
         ImGui.UpdateText(txtOutputId, collectible .. ' | ' .. itemPoolName)
+        mod.png = nil
       end
     else
       ImGui.UpdateText(txtOutputId, 'Refresh once you are in a run!')
+      mod.png = nil
     end
   end
   
@@ -520,4 +546,5 @@ if REPENTOGON then
   
   mod:setupImGuiMenu()
   mod:AddCallback(ModCallbacks.MC_POST_MODS_LOADED, mod.onModsLoaded)
+  mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
 end

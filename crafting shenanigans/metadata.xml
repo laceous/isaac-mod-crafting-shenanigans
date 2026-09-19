@@ -15,8 +15,10 @@ Update: There's a new option to log recipes to the log file. There's more than 3
 
 The log file is located here: C:\Users\username\Documents\My Games\Binding of Isaac Repentance+\log.txt
 
-Update x2: Add debug tab that lets you update/clear the player's bag of crafting.</description>
-    <version>1.19</version>
+Update x2: Add debug tab that lets you update/clear the player's bag of crafting.
+
+Update x3: Show preview of the calculated item below the first player.</description>
+    <version>1.20</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
 </metadata>
