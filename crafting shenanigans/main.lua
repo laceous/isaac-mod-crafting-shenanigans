@@ -4,6 +4,8 @@ local game = Game()
 if REPENTOGON then
   mod.sprite = Sprite()
   mod.png = nil
+  mod.collectible = nil
+  mod.isOverridingEID = false
   
   mod.craftingXmlMap = {
     [BagOfCraftingPickup.BOC_RED_HEART] = 'h',
@@ -153,30 +155,45 @@ if REPENTOGON then
   end
   
   function mod:onRender()
-    if not (mod.png and ImGui.IsVisible() and ImGui.GetVisible('shenanigansWindowCrafting')) then
-      return
-    end
-    if not mod.sprite:IsLoaded() then
-      mod.sprite:Load('gfx/005.100_collectible.anm2', true)
-    end
-    if not mod.sprite:IsPlaying() then
-      mod.sprite:Play('ShopIdle', true)
-    end
-    if mod.sprite:GetLayer(1):GetSpritesheetPath() ~= mod.png then
-      mod.sprite:ReplaceSpritesheet(1, mod.png, true)
-    end
-    
-    local player = game:GetPlayer(0)
-    local pos = Isaac.WorldToScreen(player.Position)
-    pos.Y = pos.Y + 25
-    
-    if game:GetRoom():IsMirrorWorld() then
-      local wtrp320x280 = Isaac.WorldToRenderPosition(Vector(320, 280))
-      mod.sprite.FlipX = true
-      mod.sprite:Render(Vector(wtrp320x280.X*2 - pos.X, pos.Y))
+    if mod.png and ImGui.IsVisible() and ImGui.GetVisible('shenanigansWindowCrafting') then
+      if EID and not EID.isHidden then
+        EID:displayPermanentText(EID:getDescriptionObj(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, mod.collectible))
+        EID.permanentDisplayTextObj.Name = EID:getObjectName(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, mod.collectible) -- temp fix
+        mod.isOverridingEID = true
+      else
+        if not mod.sprite:IsLoaded() then
+          mod.sprite:Load('gfx/005.100_collectible.anm2', true)
+        end
+        if not mod.sprite:IsPlaying() then
+          mod.sprite:Play('ShopIdle', true)
+        end
+        if mod.sprite:GetLayer(1):GetSpritesheetPath() ~= mod.png then
+          mod.sprite:ReplaceSpritesheet(1, mod.png, true)
+        end
+        
+        local player = game:GetPlayer(0)
+        local pos = Isaac.WorldToScreen(player.Position)
+        pos.Y = pos.Y + 25
+        
+        if game:GetRoom():IsMirrorWorld() then
+          local wtrp320x280 = Isaac.WorldToRenderPosition(Vector(320, 280))
+          mod.sprite.FlipX = true
+          mod.sprite:Render(Vector(wtrp320x280.X*2 - pos.X, pos.Y))
+        else
+          mod.sprite.FlipX = false
+          mod.sprite:Render(pos)
+        end
+        
+        if mod.isOverridingEID then
+          EID:hidePermanentText()
+          mod.isOverridingEID = false
+        end
+      end
     else
-      mod.sprite.FlipX = false
-      mod.sprite:Render(pos)
+      if mod.isOverridingEID then
+        EID:hidePermanentText()
+        mod.isOverridingEID = false
+      end
     end
   end
   
@@ -267,9 +284,11 @@ if REPENTOGON then
         ImGui.UpdateText(txtOutputId, collectible .. ' | ' .. itemPoolName)
         mod.png = nil
       end
+      mod.collectible = collectible
     else
       ImGui.UpdateText(txtOutputId, 'Refresh once you are in a run!')
       mod.png = nil
+      mod.collectible = nil
     end
   end
   
