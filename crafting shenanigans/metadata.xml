@@ -19,10 +19,10 @@ Update x2: Add debug tab that lets you update/clear the player's bag of crafting
 
 Update x3: Show preview of the calculated item:
 [list]
-    [*}within EID if installed/enabled -or-
+    [*]within EID if installed/enabled -or-
     [*]below the first player (press F2 to disable EID to fallback to this option)
 [/list]</description>
-    <version>1.22</version>
+    <version>1.23</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
 </metadata>
