@@ -163,9 +163,8 @@ if REPENTOGON then
       else
         if not mod.sprite:IsLoaded() then
           mod.sprite:Load('gfx/005.100_collectible.anm2', true)
-        end
-        if not mod.sprite:IsPlaying() then
           mod.sprite:Play('ShopIdle', true)
+          mod.sprite.Color = Color(1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0.18) -- helps with certain pngs + shaders
         end
         if mod.sprite:GetLayer(1):GetSpritesheetPath() ~= mod.png then
           mod.sprite:ReplaceSpritesheet(1, mod.png, true)
