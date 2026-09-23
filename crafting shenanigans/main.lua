@@ -278,7 +278,8 @@ if REPENTOGON then
       local itemPoolName = (itemPool == ItemPoolType.POOL_TREASURE and mod:isXmlRecipe(craftingPickups, collectible)) and 'XML' or mod:getItemPoolName(itemPool)
       local collectibleConfig = itemConfig:GetCollectible(collectible)
       if collectibleConfig then
-        ImGui.UpdateText(txtOutputId, mod:localize('Items', collectibleConfig.Name) .. ' (' .. collectibleConfig.ID .. ') | ' .. itemPoolName .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. collectibleConfig.CraftingQuality) -- Quality
+        local quality = collectibleConfig.CraftingQuality == collectibleConfig.Quality and collectibleConfig.CraftingQuality or collectibleConfig.CraftingQuality .. ' (' .. collectibleConfig.Quality .. ')'
+        ImGui.UpdateText(txtOutputId, mod:localize('Items', collectibleConfig.Name) .. ' (' .. collectibleConfig.ID .. ') | ' .. itemPoolName .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. quality)
         mod.png = collectibleConfig.GfxFileName
       else
         ImGui.UpdateText(txtOutputId, collectible .. ' | ' .. itemPoolName)
@@ -303,7 +304,8 @@ if REPENTOGON then
       local itemPoolName = (itemPool == ItemPoolType.POOL_TREASURE and mod:isXmlRecipe(craftingPickups, collectible)) and 'XML' or mod:getItemPoolName(itemPool)
       local collectibleConfig = itemConfig:GetCollectible(collectible)
       if collectibleConfig then
-        table.insert(mod.logLines, mod:buildXmlStr(craftingPickups) .. ' | ' .. mod:localize('Items', collectibleConfig.Name) .. ' (' .. collectibleConfig.ID .. ') | ' .. itemPoolName .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. collectibleConfig.CraftingQuality)
+        local quality = collectibleConfig.CraftingQuality == collectibleConfig.Quality and collectibleConfig.CraftingQuality or collectibleConfig.CraftingQuality .. ' (' .. collectibleConfig.Quality .. ')'
+        table.insert(mod.logLines, mod:buildXmlStr(craftingPickups) .. ' | ' .. mod:localize('Items', collectibleConfig.Name) .. ' (' .. collectibleConfig.ID .. ') | ' .. itemPoolName .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. quality)
       else
         table.insert(mod.logLines, mod:buildXmlStr(craftingPickups) .. ' | ' .. collectible .. ' | ' .. itemPoolName)
       end
