@@ -164,7 +164,7 @@ if REPENTOGON then
         if not mod.sprite:IsLoaded() then
           mod.sprite:Load('gfx/005.100_collectible.anm2', true)
           mod.sprite:Play('ShopIdle', true)
-          mod.sprite.Color = Color(1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0.18) -- helps with certain pngs + shaders
+          --mod.sprite.Color = Color(1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0.18) -- helps with certain pngs + shaders
         end
         if mod.sprite:GetLayer(1):GetSpritesheetPath() ~= mod.png then
           mod.sprite:ReplaceSpritesheet(1, mod.png, true)
@@ -574,5 +574,5 @@ if REPENTOGON then
   
   mod:setupImGuiMenu()
   mod:AddCallback(ModCallbacks.MC_POST_MODS_LOADED, mod.onModsLoaded)
-  mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
+  mod:AddCallback(ModCallbacks.MC_POST_HUD_RENDER, mod.onRender) -- MC_HUD_RENDER also works, MC_POST_RENDER causes color issues with certain pngs + shaders
 end
