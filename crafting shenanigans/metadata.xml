@@ -22,7 +22,7 @@ Update x3: Show preview of the calculated item:
     [*]within EID if installed/enabled -or-
     [*]below the first player (press F2 to disable EID to fallback to this option)
 [/list]</description>
-    <version>1.26</version>
+    <version>1.27</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
 </metadata>

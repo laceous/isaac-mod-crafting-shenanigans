@@ -2,6 +2,8 @@ local mod = RegisterMod('Crafting Shenanigans', 1)
 local game = Game()
 
 if REPENTOGON then
+  mod.rngShiftIdx = 35
+  
   mod.sprite = Sprite()
   mod.png = nil
   mod.collectible = nil
@@ -397,6 +399,8 @@ if REPENTOGON then
     local txtInputId = 'shenanigansTxtCraftingInput'
     local txtOutputId = 'shenanigansTxtCraftingOutput'
     local txtTotalId = 'shenanigansTxtCraftingTotal'
+    local btnSortId = 'shenanigansBtnCraftingSort'
+    local btnRandomId = 'shenanigansBtnCraftingRandom'
     ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SeparatorText, 'Bag of Crafting')
     for i = 1, 8 do
       ImGui.AddCombobox('shenanigansTabCraftingCalculate', 'shenanigansCmbCraftingPickup' .. i, '', function(j)
@@ -438,11 +442,33 @@ if REPENTOGON then
       mod:calculateBagOfCraftingOutput(craftingPickups, txtOutputId)
       mod:updateBagOfCraftingTotal(craftingPickups, txtTotalId)
     end)
+    ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SameLine, '')
+    ImGui.AddButton('shenanigansTabCraftingCalculate', btnSortId, '\u{f884}', function()
+      table.sort(craftingPickups)
+      for i = 1, 8 do
+        ImGui.UpdateData('shenanigansCmbCraftingPickup' .. i, ImGuiData.Value, craftingPickups[i] - 1)
+      end
+      ImGui.UpdateData(txtInputId, ImGuiData.Value, mod:buildXmlStr(craftingPickups))
+      mod:calculateBagOfCraftingOutput(craftingPickups, txtOutputId)
+      mod:updateBagOfCraftingTotal(craftingPickups, txtTotalId)
+    end, false)
+    ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SameLine, '')
+    ImGui.AddButton('shenanigansTabCraftingCalculate', btnRandomId, '\u{f523}', function()
+      local rand = Random()
+      local rng = RNG(rand <= 0 and 1 or rand, mod.rngShiftIdx)
+      for i = 1, 8 do
+        craftingPickups[i] = rng:RandomInt(#craftingOptions) + 1
+        ImGui.UpdateData('shenanigansCmbCraftingPickup' .. i, ImGuiData.Value, craftingPickups[i] - 1)
+      end
+      ImGui.UpdateData(txtInputId, ImGuiData.Value, mod:buildXmlStr(craftingPickups))
+      mod:calculateBagOfCraftingOutput(craftingPickups, txtOutputId)
+      mod:updateBagOfCraftingTotal(craftingPickups, txtTotalId)
+    end, false)
     local txtInputHelp = 'Formatting from recipes.xml\n'
     for i, v in ipairs(mod.craftingXmlMap) do
       txtInputHelp = txtInputHelp .. '\n' .. craftingOptions[i] .. ': ' .. v
     end
-    ImGui.SetHelpmarker(txtInputId, txtInputHelp)
+    ImGui.SetHelpmarker(btnRandomId, txtInputHelp)
     
     ImGui.AddElement('shenanigansTabCraftingCalculate', '', ImGuiElement.SeparatorText, 'Players (Copy)')
     for i = 1, 8 do
