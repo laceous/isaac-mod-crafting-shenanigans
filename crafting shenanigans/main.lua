@@ -542,7 +542,8 @@ if REPENTOGON then
     for i = 1, #itemConfig:GetCollectibles() - 1 do
       local collectibleConfig = itemConfig:GetCollectible(i)
       if collectibleConfig then
-        table.insert(itemOverrides, collectibleConfig.ID .. ' - ' .. mod:localize('Items', collectibleConfig.Name) .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. collectibleConfig.CraftingQuality)
+        local quality = collectibleConfig.CraftingQuality == collectibleConfig.Quality and collectibleConfig.CraftingQuality or collectibleConfig.CraftingQuality .. ' (' .. collectibleConfig.Quality .. ')'
+        table.insert(itemOverrides, collectibleConfig.ID .. ' - ' .. mod:localize('Items', collectibleConfig.Name) .. ' | ' .. mod:getItemTypeName(collectibleConfig.Type) .. ' | Quality: ' .. quality)
       end
     end
     ImGui.AddElement('shenanigansTabCraftingDebug', '', ImGuiElement.SeparatorText, 'Players (Update)')
