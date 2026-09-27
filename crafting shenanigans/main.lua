@@ -211,6 +211,61 @@ if REPENTOGON then
     return mod.itemPoolNames[i] or i
   end
   
+  -- this doesn't work until a run has started, XMLData has the same issue
+  -- don't log this, this is way too slow and dynamic
+  function mod:getCollectibleItemPoolNames(collectible, craftingPickups)
+    local itemPool = game:GetItemPool()
+    local tbl = {}
+    
+    local craftingPickupCounts = {}
+    for _, v in ipairs(craftingPickups) do
+      craftingPickupCounts[v] = (craftingPickupCounts[v] or 0) + 1
+    end
+    
+    -- the game doesn't seem to pull from the "_GREED_" item pools in greed mode
+    local itemPools = { ItemPoolType.POOL_TREASURE, ItemPoolType.POOL_SHOP, ItemPoolType.POOL_BOSS }
+    if craftingPickupCounts[BagOfCraftingPickup.BOC_BLACK_HEART] then
+      table.insert(itemPools, ItemPoolType.POOL_DEVIL)
+    end
+    if craftingPickupCounts[BagOfCraftingPickup.BOC_ETERNAL_HEART] then
+      table.insert(itemPools, ItemPoolType.POOL_ANGEL)
+    end
+    if craftingPickupCounts[BagOfCraftingPickup.BOC_BONE_HEART] then
+      table.insert(itemPools, ItemPoolType.POOL_SECRET)
+    end
+    if craftingPickupCounts[BagOfCraftingPickup.BOC_POOP] then
+      table.insert(itemPools, ItemPoolType.POOL_SHELL_GAME)
+    end
+    if craftingPickupCounts[BagOfCraftingPickup.BOC_GOLD_HEART] then
+      table.insert(itemPools, ItemPoolType.POOL_GOLDEN_CHEST)
+    end
+    if craftingPickupCounts[BagOfCraftingPickup.BOC_CRACKED_KEY] then
+      table.insert(itemPools, ItemPoolType.POOL_RED_CHEST)
+    end
+    if craftingPickupCounts[BagOfCraftingPickup.BOC_ROTTEN_HEART] then
+      table.insert(itemPools, ItemPoolType.POOL_CURSE)
+    end
+    if craftingPickupCounts[BagOfCraftingPickup.BOC_RUNE] and
+       not craftingPickupCounts[BagOfCraftingPickup.BOC_PENNY] and
+       not craftingPickupCounts[BagOfCraftingPickup.BOC_BOMB] and
+       not craftingPickupCounts[BagOfCraftingPickup.BOC_KEY] and
+       not craftingPickupCounts[BagOfCraftingPickup.BOC_RED_HEART]
+    then
+      table.insert(itemPools, ItemPoolType.POOL_PLANETARIUM)
+    end
+    
+    for _, v in ipairs(itemPools) do
+      for _, w in ipairs(itemPool:GetCollectiblesFromPool(v)) do
+        if w.itemID == collectible then
+          table.insert(tbl, mod:getItemPoolName(v))
+          break
+        end
+      end
+    end
+    
+    return #tbl > 0 and table.concat(tbl, ', ')
+  end
+  
   function mod:isXmlRecipe(craftingPickups, collectible)
     local craftingPickupsCopy = { table.unpack(craftingPickups) }
     table.sort(craftingPickupsCopy)
@@ -275,8 +330,8 @@ if REPENTOGON then
   function mod:calculateBagOfCraftingOutput(craftingPickups, txtOutputId)
     if Isaac.IsInGame() then
       local itemConfig = Isaac.GetItemConfig()
-      local collectible, itemPool = EntityPlayer.CalculateBagOfCraftingOutput(craftingPickups)
-      local itemPoolName = (itemPool == ItemPoolType.POOL_TREASURE and mod:isXmlRecipe(craftingPickups, collectible)) and 'XML' or mod:getItemPoolName(itemPool)
+      local collectible, itemPool = EntityPlayer.CalculateBagOfCraftingOutput(craftingPickups) -- itemPool seems to return the 1st pool the item is in rather than the "correct" pool
+      local itemPoolName = (itemPool == ItemPoolType.POOL_TREASURE and mod:isXmlRecipe(craftingPickups, collectible)) and 'XML' or (mod:getCollectibleItemPoolNames(collectible, craftingPickups) or mod:getItemPoolName(itemPool))
       local collectibleConfig = itemConfig:GetCollectible(collectible)
       if collectibleConfig then
         local quality = collectibleConfig.CraftingQuality == collectibleConfig.Quality and collectibleConfig.CraftingQuality or collectibleConfig.CraftingQuality .. ' (' .. collectibleConfig.Quality .. ')'
