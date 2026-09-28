@@ -224,34 +224,24 @@ if REPENTOGON then
     
     -- the game doesn't seem to pull from the "_GREED_" item pools in greed mode
     local itemPools = { ItemPoolType.POOL_TREASURE, ItemPoolType.POOL_SHOP, ItemPoolType.POOL_BOSS }
-    if craftingPickupCounts[BagOfCraftingPickup.BOC_BLACK_HEART] then
-      table.insert(itemPools, ItemPoolType.POOL_DEVIL)
-    end
-    if craftingPickupCounts[BagOfCraftingPickup.BOC_ETERNAL_HEART] then
-      table.insert(itemPools, ItemPoolType.POOL_ANGEL)
-    end
-    if craftingPickupCounts[BagOfCraftingPickup.BOC_BONE_HEART] then
-      table.insert(itemPools, ItemPoolType.POOL_SECRET)
-    end
-    if craftingPickupCounts[BagOfCraftingPickup.BOC_POOP] then
-      table.insert(itemPools, ItemPoolType.POOL_SHELL_GAME)
-    end
-    if craftingPickupCounts[BagOfCraftingPickup.BOC_GOLD_HEART] then
-      table.insert(itemPools, ItemPoolType.POOL_GOLDEN_CHEST)
-    end
-    if craftingPickupCounts[BagOfCraftingPickup.BOC_CRACKED_KEY] then
-      table.insert(itemPools, ItemPoolType.POOL_RED_CHEST)
-    end
-    if craftingPickupCounts[BagOfCraftingPickup.BOC_ROTTEN_HEART] then
-      table.insert(itemPools, ItemPoolType.POOL_CURSE)
-    end
-    if craftingPickupCounts[BagOfCraftingPickup.BOC_RUNE] and
-       not craftingPickupCounts[BagOfCraftingPickup.BOC_PENNY] and
-       not craftingPickupCounts[BagOfCraftingPickup.BOC_BOMB] and
-       not craftingPickupCounts[BagOfCraftingPickup.BOC_KEY] and
-       not craftingPickupCounts[BagOfCraftingPickup.BOC_RED_HEART]
-    then
-      table.insert(itemPools, ItemPoolType.POOL_PLANETARIUM)
+    for _, v in ipairs({
+                        { cond = craftingPickupCounts[BagOfCraftingPickup.BOC_BLACK_HEART]  , itemPool = ItemPoolType.POOL_DEVIL },
+                        { cond = craftingPickupCounts[BagOfCraftingPickup.BOC_ETERNAL_HEART], itemPool = ItemPoolType.POOL_ANGEL },
+                        { cond = craftingPickupCounts[BagOfCraftingPickup.BOC_BONE_HEART]   , itemPool = ItemPoolType.POOL_SECRET },
+                        { cond = craftingPickupCounts[BagOfCraftingPickup.BOC_POOP]         , itemPool = ItemPoolType.POOL_SHELL_GAME },
+                        { cond = craftingPickupCounts[BagOfCraftingPickup.BOC_GOLD_HEART]   , itemPool = ItemPoolType.POOL_GOLDEN_CHEST },
+                        { cond = craftingPickupCounts[BagOfCraftingPickup.BOC_CRACKED_KEY]  , itemPool = ItemPoolType.POOL_RED_CHEST },
+                        { cond = craftingPickupCounts[BagOfCraftingPickup.BOC_ROTTEN_HEART] , itemPool = ItemPoolType.POOL_CURSE },
+                        { cond = craftingPickupCounts[BagOfCraftingPickup.BOC_RUNE] and
+                                 not craftingPickupCounts[BagOfCraftingPickup.BOC_PENNY] and
+                                 not craftingPickupCounts[BagOfCraftingPickup.BOC_BOMB] and
+                                 not craftingPickupCounts[BagOfCraftingPickup.BOC_KEY] and
+                                 not craftingPickupCounts[BagOfCraftingPickup.BOC_RED_HEART], itemPool = ItemPoolType.POOL_PLANETARIUM },
+                      })
+    do
+      if v.cond then
+        table.insert(itemPools, v.itemPool)
+      end
     end
     
     for _, v in ipairs(itemPools) do
