@@ -7,6 +7,7 @@ if REPENTOGON then
   mod.sprite = Sprite()
   mod.png = nil
   mod.collectible = nil
+  mod.collectibleCmd = nil
   mod.isOverridingEID = false
   
   mod.craftingXmlMap = {
@@ -198,6 +199,50 @@ if REPENTOGON then
     end
   end
   
+  -- usage: crafting-collectible c1
+  function mod:onExecuteCmd(cmd, parameters)
+    cmd = string.lower(cmd)
+    
+    if cmd == 'crafting-collectible' then
+      if Isaac.IsInGame() then
+        if string.len(parameters) >= 2 and string.sub(parameters, 1, 1) == 'c' then
+          local collectible = tonumber(string.sub(parameters, 2))
+          if math.type(collectible) == 'integer' and collectible > CollectibleType.COLLECTIBLE_NULL then
+            local itemConfig = Isaac.GetItemConfig()
+            local collectibleConfig = itemConfig:GetCollectible(collectible)
+            if collectibleConfig then
+              if collectibleConfig:IsAvailable() and collectibleConfig.CraftingQuality > -1 then
+                local isCollectibleInItemPool = mod:isCollectibleInItemPool(collectibleConfig.ID)
+                if isCollectibleInItemPool then
+                  local arr = {}
+                  for i = 1, 29 do
+                    table.insert(arr, i)
+                  end
+                  local n = #arr
+                  local r = 4 -- 5?
+                  local tblPrefix = isCollectibleInItemPool == ItemPoolType.POOL_PLANETARIUM and { 7, 7, 7, 7 } or { 1, 1, 1, 1 } -- rotten hearts for planetarium
+                  mod.collectibleCmd = collectibleConfig.ID
+                  local craftingPickups = mod:doCombinationRepetition(arr, n, r, tblPrefix, mod.checkBagOfCraftingOutput)
+                  if craftingPickups then
+                    local recipe = mod:buildXmlStr(craftingPickups)
+                    Isaac.SetClipboard(recipe)
+                    print(mod:localize('Items', collectibleConfig.Name) .. ' (' .. collectibleConfig.ID .. ') | ' .. recipe)
+                    return
+                  end
+                end
+              end
+              print(mod:localize('Items', collectibleConfig.Name) .. ' (' .. collectibleConfig.ID .. ') | n/a')
+              return
+            end
+            print(collectible .. ' | n/a')
+          end
+        end
+      end
+    end
+  end
+  
+  Console.RegisterCommand('crafting-collectible', 'Finds a recipe for any collectible, copies result to clipboard', 'Finds a recipe for any collectible, copies result to clipboard', false, AutocompleteType.ITEM)
+  
   function mod:localize(category, key)
     local s = Isaac.GetString(category, key)
     return (s == nil or s == 'StringTable::InvalidCategory' or s == 'StringTable::InvalidKey') and key or s
@@ -254,6 +299,31 @@ if REPENTOGON then
     end
     
     return #tbl > 0 and table.concat(tbl, ', ')
+  end
+  
+  function mod:isCollectibleInItemPool(collectible)
+    local itemPool = game:GetItemPool()
+    for _, v in ipairs({
+                        ItemPoolType.POOL_PLANETARIUM, -- check this first, needs special handling
+                        ItemPoolType.POOL_TREASURE,
+                        ItemPoolType.POOL_SHOP,
+                        ItemPoolType.POOL_BOSS,
+                        ItemPoolType.POOL_DEVIL,
+                        ItemPoolType.POOL_ANGEL,
+                        ItemPoolType.POOL_SECRET,
+                        ItemPoolType.POOL_SHELL_GAME,
+                        ItemPoolType.POOL_GOLDEN_CHEST,
+                        ItemPoolType.POOL_RED_CHEST,
+                        ItemPoolType.POOL_CURSE,
+                      })
+    do
+      for _, w in ipairs(itemPool:GetCollectiblesFromPool(v)) do
+        if w.itemID == collectible then
+          return v
+        end
+      end
+    end
+    return false
   end
   
   function mod:isXmlRecipe(craftingPickups, collectible)
@@ -372,25 +442,34 @@ if REPENTOGON then
     end
   end
   
-  -- https://www.geeksforgeeks.org/dsa/combinations-with-repetitions/
-  -- converted to lua
-  function mod:doCombinationRepetition(arr, n, r, tblPrefix)
-    local chosen = {}
-    mod:doCombinationRepetitionUtil(chosen, arr, 1, r, 1, n, tblPrefix)
+  function mod:checkBagOfCraftingOutput(craftingPickups)
+    local collectible = EntityPlayer.CalculateBagOfCraftingOutput(craftingPickups)
+    if collectible == mod.collectibleCmd then
+      return craftingPickups
+    end
   end
   
-  function mod:doCombinationRepetitionUtil(chosen, arr, index, r, start, last, tblPrefix)
+  -- https://www.geeksforgeeks.org/dsa/combinations-with-repetitions/
+  -- converted to lua
+  function mod:doCombinationRepetition(arr, n, r, tblPrefix, callback)
+    local chosen = {}
+    return mod:doCombinationRepetitionUtil(chosen, arr, 1, r, 1, n, tblPrefix, callback)
+  end
+  
+  function mod:doCombinationRepetitionUtil(chosen, arr, index, r, start, last, tblPrefix, callback)
     if index == r + 1 then
       for i = 1, r do
         tblPrefix[8 - r + i] = arr[chosen[i]]
       end
-      mod:logBagOfCraftingOutput(tblPrefix)
-      return
+      return callback(self, tblPrefix)
     end
     
     for i = start, last do
       chosen[index] = i
-      mod:doCombinationRepetitionUtil(chosen, arr, index + 1, r, i, last, tblPrefix)
+      local retVal = mod:doCombinationRepetitionUtil(chosen, arr, index + 1, r, i, last, tblPrefix, callback)
+      if retVal then
+        return retVal
+      end
     end
   end
   
@@ -560,7 +639,7 @@ if REPENTOGON then
           local r = i
           local tblPrefix = { table.unpack(craftingPickups, 1, 8 - i) }
           Isaac.DebugString(mod.Name .. ' | Last ' .. i .. ' | Seed: ' .. seeds:GetStartSeedString())
-          mod:doCombinationRepetition(arr, n, r, tblPrefix)
+          mod:doCombinationRepetition(arr, n, r, tblPrefix, mod.logBagOfCraftingOutput)
           mod:logBagOfCraftingOutput()
           ImGui.PushNotification('Recipes logged to file', ImGuiNotificationType.SUCCESS, 5000)
         else
@@ -642,9 +721,13 @@ if REPENTOGON then
         ImGui.SetHelpmarker(btnPlayerId, 'Clear the last x slots from the player\'s bag of crafting (8 to clear the entire bag)')
       end
     end
+    
+    ImGui.AddElement('shenanigansTabCraftingDebug', '', ImGuiElement.SeparatorText, 'Console')
+    ImGui.AddText('shenanigansTabCraftingDebug', 'Use the crafting-collectible command to find a recipe for any collectible.', true, '')
   end
   
   mod:setupImGuiMenu()
   mod:AddCallback(ModCallbacks.MC_POST_MODS_LOADED, mod.onModsLoaded)
   mod:AddCallback(ModCallbacks.MC_POST_HUD_RENDER, mod.onRender) -- MC_HUD_RENDER also works, MC_POST_RENDER causes color issues with certain pngs + shaders
+  mod:AddCallback(ModCallbacks.MC_EXECUTE_CMD, mod.onExecuteCmd)
 end
