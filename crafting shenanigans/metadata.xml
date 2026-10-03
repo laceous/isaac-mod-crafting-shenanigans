@@ -24,7 +24,7 @@ Update x3: Show preview of the calculated item:
 [/list]
 
 Update x4: Add crafting-collectible command to find a recipe for any collectible.</description>
-    <version>1.31</version>
+    <version>1.32</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
 </metadata>

@@ -161,7 +161,6 @@ if REPENTOGON then
     if mod.png and ImGui.IsVisible() and ImGui.GetVisible('shenanigansWindowCrafting') then
       if EID and not EID.isHidden then
         EID:displayPermanentText(EID:getDescriptionObj(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, mod.collectible))
-        EID.permanentDisplayTextObj.Name = EID:getObjectName(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, mod.collectible) -- temp fix
         mod.isOverridingEID = true
       else
         if not mod.sprite:IsLoaded() then
